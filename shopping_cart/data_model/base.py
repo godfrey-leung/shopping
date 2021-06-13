@@ -8,6 +8,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, Session
 from sqlalchemy.orm.exc import NoResultFound
 
+from shopping_cart.exc import InstanceNotFound
+
 
 Base = declarative_base()
 
@@ -91,9 +93,10 @@ class ModelMixin(QueryMixin):
         -------
             Instance with the given id
 
-        Exceptions
+        Raises
         ----------
-
+        InstanceNotFound
+            if an instance of the given ID is not found
 
         """
 
@@ -104,4 +107,6 @@ class ModelMixin(QueryMixin):
                 cls.id == object_id
             ).one()
         except NoResultFound:
-            raise
+            raise InstanceNotFound(
+                f"Instance with ID {object_id} is not found in the database"
+            )

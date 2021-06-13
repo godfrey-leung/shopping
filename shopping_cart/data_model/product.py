@@ -3,53 +3,78 @@ from abc import ABC, abstractmethod
 from sqlalchemy import (
     Column, Integer, String, TIMESTAMP, Date, ForeignKey, func, Float, Boolean, DateTime, Table
 )
+from sqlalchemy.orm import relationship, Session
 
-from data_model.base import Base
+from shopping_cart.data_model.base import Base, ModelMixin
 
-class Position(Base, ModelMixin):
+
+class Product(Base, ModelMixin):
+    """
+    A product available for selection
+    """
     __tablename__ = "product"
 
     name = Column(String)
     unit_price = Column(Float)
-    discount_offer = Column()
 
-    operations = relationship(
-        "Operation",
-        secondary=operation_positions
+    items = relationship(
+        "Item",
+        back_populates="product"
+    )
+
+    # Associated discount offer, can be None
+    discount_offer_id = Column(
+        Integer,
+        ForeignKey(
+            "product.id"
+        )
+    )
+    discount_offer: "DiscountOffer" = relationship(
+        "DiscountOffer",
+        uselist=False,
+        back_populates="product"
     )
 
 
-
-
-class AbstractProduct(ABC):
+class DiscountOffer(Base, ModelMixin):
     """
-    Abstract base product class
+    A discount offer associated to a product
     """
+    __tablename__ = "discount_offer"
 
-    def __init__(
-            self,
-            name: str,
-            unit_price: float
-    ):
-        """
-
-        Parameters
-        ----------
-        name
-            name of the product
-        unit_price
-            marked price for one unit
-        """
-        self.name = name
-        self.unit_price = unit_price
-
-    @property
-    @abstractmethod
-    def offer(self):
-        """
-
-        """
-        pass
+    product_id = Column(
+        Integer,
+        ForeignKey(
+            "product.id"
+        )
+    )
+    product: "Product" = relationship(
+        "Product",
+        uselist=False,
+        back_populates="discount_offer"
+    )
 
 
-class Product:
+class Item(Base, ModelMixin):
+    """
+    A specific product item
+    """
+    __tablename__ = "item"
+
+    product_id = Column(
+        Integer,
+        ForeignKey(
+            "product.id"
+        )
+    )
+    product: "Product" = relationship(
+        "Product",
+        uselist=False,
+        back_populates="items"
+    )
+
+    # def purchase_price(
+    #         self
+    # ):
+
+

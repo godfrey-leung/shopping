@@ -12,17 +12,7 @@ def make_session():
     model.Base.metadata.create_all(engine)
     yield session
     session.close()
-    engine.dispose()
 
-
-@pytest.fixture(name="query_mixin")
-def make_query_mixin():
-    return model.QueryMixin()
-
-
-@pytest.fixture(name="model_mixin")
-def make_mode_mixin():
-    return model.ModelMixin()
 #
 #
 #
