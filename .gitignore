@@ -1,0 +1,13 @@
+# Unit test / coverage reports
+.pytest_cache/
+
+# pycharm
+.idea/
+
+# mac
+.DS_Store
+
+#pycache
+__pycache__
+__init__.pyc
+
