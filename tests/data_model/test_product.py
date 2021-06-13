@@ -196,7 +196,7 @@ class TestDiscountOffer:
             DiscountOffer(
                 id=0,
                 required_quantity=0,
-                discount=50
+                percentage=50
             )
 
         expected_error_message = (
@@ -215,7 +215,7 @@ class TestDiscountOffer:
             DiscountOffer(
                 id=0,
                 required_quantity=3,
-                discount=120
+                percentage=120
             )
 
         expected_error_message = (
@@ -237,7 +237,7 @@ class TestDiscountOffer:
         offer = DiscountOffer(
             id=0,
             required_quantity=4,
-            discount=30,
+            percentage=30,
             product=product_example
         )
         session.add(offer)

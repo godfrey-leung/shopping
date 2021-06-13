@@ -182,7 +182,7 @@ class DiscountOffer(Base, ModelMixin):
     __tablename__ = "discount_offer"
 
     required_quantity = Column(Integer)
-    discount = Column(Float)
+    percentage = Column(Float)
 
     @validates('required_quantity')
     def validate_required_quantity(self, key, value):
@@ -193,7 +193,7 @@ class DiscountOffer(Base, ModelMixin):
 
         return value
 
-    @validates('discount')
+    @validates('percentage')
     def validate_discount(self, key, value):
         if not 100 > value >= 0:
             raise InvalidValue(
