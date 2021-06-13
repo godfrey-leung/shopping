@@ -18,3 +18,10 @@ class OverDemand(Exception):
     """
     Raise if excess demand is requested
     """
+
+
+class InvalidAmount(Exception):
+    """
+    Raise if an invalid total/tax/discount amount
+    is assigned to a shopping cart
+    """
