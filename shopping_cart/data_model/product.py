@@ -1,3 +1,4 @@
+import operator
 import random
 from typing import List
 
@@ -5,9 +6,10 @@ from sqlalchemy import (
     Column, Integer, String, TIMESTAMP, Date, ForeignKey, func, Float, Boolean, DateTime, Table
 )
 from sqlalchemy.orm import relationship, Session, validates
+from sqlalchemy.orm.exc import NoResultFound
 
 from shopping_cart.data_model.base import Base, ModelMixin
-from shopping_cart.exc import InvalidValue, OverDemand
+from shopping_cart.exc import InvalidValue, OverDemand, InstanceNotFound
 
 
 class Product(Base, ModelMixin):
@@ -57,6 +59,102 @@ class Product(Base, ModelMixin):
         uselist=False,
         back_populates="product"
     )
+
+    @classmethod
+    def with_name(
+            cls,
+            session: Session,
+            name: str
+    ) -> "Product":
+        """
+        Query a product with the given name from
+        a store database
+
+        Parameters
+        ----------
+        session
+            a store database
+        name
+            name of the product
+
+        Returns
+        -------
+            product of the given name
+
+        Raises
+        ------
+        InstanceNotFound
+            If the product name is not found
+
+        """
+
+        try:
+            return session.query(
+                cls
+            ).filter(
+                cls.name == name
+            ).one()
+        except NoResultFound:
+            raise InstanceNotFound(
+                f"Product {name} not found."
+            )
+
+    @classmethod
+    def pick(
+            cls,
+            session: Session,
+            name: str,
+            quantity: int,
+            is_random: bool = False
+    ) -> List["Item"]:
+        """
+        Pick N available items from the store database
+
+        Parameters
+        ----------
+        session
+            A store database session
+        name
+            name of the parent product
+        quantity
+            number of quantity to pick
+        is_random
+            If True, randomly pick the N
+            available items from the database.
+            Default = False
+
+        Returns
+        -------
+            list of picked items
+
+        Raises
+        ------
+        OverDemand
+            If request to pick more items than what is available
+            in the database
+
+        """
+
+        product = cls.with_name(session, name)
+        items_available = [
+            item for item in product.items
+            if item.is_available
+        ]
+        items_available = sorted(
+            items_available,
+            key=operator.attrgetter('id')
+        )
+
+        if len(items_available) < quantity:
+            raise OverDemand(
+                f"Excess demand request. Only "
+                f"{len(items_available)} is available, but {quantity} is requested."
+            )
+
+        if is_random:
+            return random.sample(items_available, quantity)
+
+        return items_available[:quantity]
 
 
 class DiscountOffer(Base, ModelMixin):
@@ -118,6 +216,8 @@ class Item(Base, ModelMixin):
     ----------
     is_available
         Whether the item is available
+    purchased_price
+        the price the item is purchased at
     product
         what product the item is
 
@@ -125,6 +225,7 @@ class Item(Base, ModelMixin):
     __tablename__ = "item"
 
     is_available = Column(Boolean, default=True)
+    purchased_price = Column(Float)
 
     product_id = Column(
         Integer,
@@ -138,54 +239,3 @@ class Item(Base, ModelMixin):
         back_populates="items"
     )
 
-    @classmethod
-    def pick(
-            cls,
-            session: Session,
-            quantity: int,
-            is_random: bool = False
-    ) -> List["Item"]:
-        """
-        Pick N available items from the store database
-
-        Parameters
-        ----------
-        quantity
-            number of quantity to pick
-        session
-            A store database session
-        is_random
-            If True, randomly pick the N
-            available items from the database.
-            Default = False
-
-        Returns
-        -------
-            list of picked items
-
-        Raises
-        ------
-        OverDemand
-            If request to pick more items than what is available
-            in the database
-
-        """
-
-        items_available = session.query(
-            cls
-        ).filter(
-            cls.is_available
-        ).order_by(
-            ~cls.id
-        ).all()
-
-        if len(items_available) < quantity:
-            raise OverDemand(
-                f"Excess demand request. Only "
-                f"{len(items_available)} is available, but {quantity} is requested."
-            )
-
-        if is_random:
-            return random.sample(items_available, quantity)
-
-        return items_available[:quantity]

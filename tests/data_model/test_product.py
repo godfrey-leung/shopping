@@ -2,7 +2,7 @@ import pytest
 import random
 
 from shopping_cart.data_model.product import Product, DiscountOffer, Item
-from shopping_cart.exc import InvalidValue, OverDemand
+from shopping_cart.exc import InvalidValue, OverDemand, InstanceNotFound
 
 
 @pytest.fixture(autouse=True)
@@ -12,7 +12,6 @@ def fix_random_seed():
 
 @pytest.fixture(name="product")
 def make_product():
-
     def _generate(
             product_id: int,
             name: str,
@@ -72,6 +71,89 @@ class TestProduct:
         assert queried_product.name == 'Shampoo'
         assert queried_product.unit_price == 50
         assert queried_product.discount_offer is None
+
+    def test_with_name(self, product, session):
+        """
+        Test .with_name() method
+
+        """
+
+        toothpaste = product(
+            product_id=0,
+            name='Toothpaste',
+            price=20.5
+        )
+        session.add(toothpaste)
+
+        assert Product.with_name(session, 'Toothpaste') == toothpaste
+
+    def test_with_name_not_found(self, session):
+        """
+        Test .with_name() method when the given product name
+        is not in the database
+
+        """
+
+        with pytest.raises(InstanceNotFound) as exc_info:
+            Product.with_name(session, 'Toothbrush')
+
+        expected_error_message = (
+            f"Product Toothbrush not found."
+        )
+        assert exc_info.match(expected_error_message)
+
+    @pytest.mark.parametrize(
+        "is_random, item_ids",
+        [
+            (True, [2, 1, 5]),
+            (False, [1, 2, 3])
+        ]
+    )
+    def test_pick(self, product, session, is_random, item_ids):
+        """
+        Test .pick() method
+
+        """
+
+        product_example = product(
+            product_id=0,
+            name='C',
+            price=40
+        )
+
+        for i in range(10, 0, -1):
+            session.add(
+                Item(
+                    id=i,
+                    product=product_example
+                )
+            )
+
+        items = Product.pick(session, 'C', 3, is_random=is_random)
+        assert len(items) == 3
+        assert [item.id for item in items] == item_ids
+
+    def test_over_demand(self, session):
+        """
+        Test assigning invalid discount percentage
+        to the discount offer
+
+        """
+
+        session.add(
+            Product(
+                id=0,
+                name='B'
+            )
+        )
+
+        with pytest.raises(OverDemand) as exc_info:
+            Product.pick(session, 'B', 5)
+
+        expected_error_message = (
+            f"Excess demand request. Only 0 is available, but 5 is requested."
+        )
+        assert exc_info.match(expected_error_message)
 
 
 class TestDiscountOffer:
@@ -178,49 +260,3 @@ class TestItem:
         queried_product = Product.with_id(0, session)
         assert len(queried_product.items) == 1
         assert queried_product.name == 'A'
-
-    @pytest.mark.parametrize(
-        "is_random, item_ids",
-        [
-            (True, [2, 1, 5]),
-            (False, [1, 2, 3])
-        ]
-    )
-    def test_pick(self, product, session, is_random, item_ids):
-        """
-        Test .pick() method
-
-        """
-
-        product_example = product(
-            product_id=0,
-            name='C',
-            price=40
-        )
-
-        for i in range(10, 0, -1):
-            session.add(
-                Item(
-                    id=i,
-                    product=product_example
-                )
-            )
-
-        items = Item.pick(session, 3, is_random=is_random)
-        assert len(items) == 3
-        assert [item.id for item in items] == item_ids
-
-    def test_over_demand(self, session):
-        """
-        Test assigning invalid discount percentage
-        to the discount offer
-
-        """
-
-        with pytest.raises(OverDemand) as exc_info:
-            Item.pick(session, 5)
-
-        expected_error_message = (
-            f"Excess demand request. Only 0 is available, but 5 is requested."
-        )
-        assert exc_info.match(expected_error_message)
