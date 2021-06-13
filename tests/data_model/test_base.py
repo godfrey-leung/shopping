@@ -138,5 +138,5 @@ class TestModelMixin:
         with pytest.raises(InstanceNotFound) as exc_info:
             ModelBaseExample.with_id(1, session)
 
-        expected_message = "Instance with ID 1 is not found in the database"
-        assert exc_info.match(expected_message)
+        expected_error_message = "Instance with ID 1 is not found in the database"
+        assert exc_info.match(expected_error_message)
