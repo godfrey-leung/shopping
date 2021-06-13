@@ -1,0 +1,7 @@
+products:
+  - name: Dove Soap
+    unit_price: 39.99
+    number_in_store: 100
+  - name: Axe Deo
+    unit_price: 99.99
+    number_in_store: 100

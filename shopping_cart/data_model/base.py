@@ -1,11 +1,8 @@
-import logging
 from typing import List
 
-from sqlalchemy import (
-    Column, Integer, String, TIMESTAMP, Date, ForeignKey, func, Float, Boolean, DateTime, Table
-)
+from sqlalchemy import Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, Session
+from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 from shopping_cart.exc import InstanceNotFound
@@ -14,8 +11,6 @@ from shopping_cart.exc import InstanceNotFound
 Base = declarative_base()
 
 _schema_version = 1
-
-logger = logging.getLogger(__name__)
 
 
 class QueryMixin:

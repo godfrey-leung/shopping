@@ -3,7 +3,7 @@ import random
 from typing import List
 
 from sqlalchemy import (
-    Column, Integer, String, TIMESTAMP, Date, ForeignKey, func, Float, Boolean, DateTime, Table
+    Column, Integer, String, ForeignKey, Float, Boolean
 )
 from sqlalchemy.orm import relationship, Session, validates
 from sqlalchemy.orm.exc import NoResultFound

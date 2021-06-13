@@ -21,6 +21,26 @@ def make_product():
             name: str,
             price: float
     ):
+        return m.Product(
+            id=product_id,
+            name=name,
+            unit_price=price
+        )
+
+    return _generate
+
+
+@pytest.fixture(name="product")
+def make_product():
+    """
+    Pytest fixture to generate a product instance
+
+    """
+    def _generate(
+            product_id: int,
+            name: str,
+            price: float
+    ):
         return Product(
             id=product_id,
             name=name,

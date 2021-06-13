@@ -1,0 +1,16 @@
+products:
+  - name: A
+    unit_price: 29.99
+    number_in_store: 30
+  - name: B
+    unit_price: 199.99
+    number_in_store: 20
+    promotion:
+      required_quantity: 3
+      percentage: 50
+  - name: C
+    unit_price: 100
+    number_in_store: 10
+    promotion:
+      required_quantity: 2
+      percentage: 0
