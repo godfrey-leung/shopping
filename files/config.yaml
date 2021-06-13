@@ -1,0 +1,30 @@
+inference:
+  name: STACKED
+  images_per_gpu: 1
+  gpu_count: 1
+  width: 1024
+  detection_min_confidence: 0.95
+  rotational_inference: false
+
+general:
+  database_url: postgresql://${PGUSER_ORBOT}:${PGPASSWORD_ORBOT}@${PGHOST_ORBOT}:${PGPORT_ORBOT}/${PGDATABASE_ORBOT}
+  secret: ${SECRET_ORBOT}
+
+aws:
+  image_bucket: scalpel-instrument-testing
+  model_bucket: scalpel-stack-single-balance
+#  model_bucket: scalpel-stack-all-balance
+
+image:
+  angles:
+    increment: 5
+    max_angle: 15
+    output_rotational_results: false
+  overlap_limit: 0.1
+
+path:
+  images: files/office_test/instrument_23.csv
+  model: checkpoint/stacked20210430T1942/
+#  model: checkpoint/stacked20210506T1841/
+  instruments: files/instruments.json
+

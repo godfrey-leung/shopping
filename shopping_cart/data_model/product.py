@@ -1,4 +1,5 @@
-from abc import ABC, abstractmethod
+import random
+from typing import List
 
 from sqlalchemy import (
     Column, Integer, String, TIMESTAMP, Date, ForeignKey, func, Float, Boolean, DateTime, Table
@@ -6,7 +7,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship, Session, validates
 
 from shopping_cart.data_model.base import Base, ModelMixin
-from shopping_cart.exc import InvalidValue
+from shopping_cart.exc import InvalidValue, OverDemand
 
 
 class Product(Base, ModelMixin):
@@ -112,8 +113,18 @@ class DiscountOffer(Base, ModelMixin):
 class Item(Base, ModelMixin):
     """
     A specific product item
+
+    Attributes
+    ----------
+    is_available
+        Whether the item is available
+    product
+        what product the item is
+
     """
     __tablename__ = "item"
+
+    is_available = Column(Boolean, default=True)
 
     product_id = Column(
         Integer,
@@ -127,8 +138,54 @@ class Item(Base, ModelMixin):
         back_populates="items"
     )
 
-    # def purchase_price(
-    #         self
-    # ):
+    @classmethod
+    def pick(
+            cls,
+            session: Session,
+            quantity: int,
+            is_random: bool = False
+    ) -> List["Item"]:
+        """
+        Pick N available items from the store database
 
+        Parameters
+        ----------
+        quantity
+            number of quantity to pick
+        session
+            A store database session
+        is_random
+            If True, randomly pick the N
+            available items from the database.
+            Default = False
 
+        Returns
+        -------
+            list of picked items
+
+        Raises
+        ------
+        OverDemand
+            If request to pick more items than what is available
+            in the database
+
+        """
+
+        items_available = session.query(
+            cls
+        ).filter(
+            cls.is_available
+        ).order_by(
+            ~cls.id
+        ).all()
+
+        if len(items_available) < quantity:
+            raise OverDemand(
+                f"Excess demand request. Only "
+                f"{len(items_available)} is available, but {quantity} is requested."
+            )
+
+        if is_random:
+            return random.sample(items_available, quantity)
+
+        return items_available[:quantity]

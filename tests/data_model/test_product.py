@@ -1,7 +1,13 @@
 import pytest
+import random
 
-from shopping_cart.data_model.product import Product, DiscountOffer
-from shopping_cart.exc import InvalidValue
+from shopping_cart.data_model.product import Product, DiscountOffer, Item
+from shopping_cart.exc import InvalidValue, OverDemand
+
+
+@pytest.fixture(autouse=True)
+def fix_random_seed():
+    random.seed(42)
 
 
 @pytest.fixture(name="product")
@@ -111,7 +117,7 @@ class TestDiscountOffer:
         )
         assert exc_info.match(expected_error_message)
 
-    def test_add_offers(self, product, session):
+    def test_add_offer(self, product, session):
         """
         Test add an offer to the database
 
@@ -139,25 +145,82 @@ class TestDiscountOffer:
         assert Product.with_id(0, session) == product_example
 
 
-    # def test_add_offers(self, product, session):
-    #     """
-    #     Test add an offer to the database
-    #
-    #     """
+class TestItem:
+    """
+    Test the item class
+    """
 
+    def test_add_item(self, product, session):
+        """
+        Test add an offer to the database
 
-#
-# class TestProduct:
-#     """
-#     Test the product class
-#     """
-#
-#     def test_add_products(self):
-#         """
-#         Test add products to the database
-#
-#         """
-#
-#         product_1 = model.Product(
-#
-#         )
+        """
+
+        product_example = product(
+            product_id=0,
+            name='A',
+            price=30
+        )
+
+        session.add(
+            Item(
+                id=0,
+                product=product_example
+            )
+        )
+
+        assert Item.count(session) == 1
+        assert Item.exists(0, session) is True
+
+        # Check if associated product is added
+        assert Product.exists(0, session) is True
+
+        queried_product = Product.with_id(0, session)
+        assert len(queried_product.items) == 1
+        assert queried_product.name == 'A'
+
+    @pytest.mark.parametrize(
+        "is_random, item_ids",
+        [
+            (True, [2, 1, 5]),
+            (False, [1, 2, 3])
+        ]
+    )
+    def test_pick(self, product, session, is_random, item_ids):
+        """
+        Test .pick() method
+
+        """
+
+        product_example = product(
+            product_id=0,
+            name='C',
+            price=40
+        )
+
+        for i in range(10, 0, -1):
+            session.add(
+                Item(
+                    id=i,
+                    product=product_example
+                )
+            )
+
+        items = Item.pick(session, 3, is_random=is_random)
+        assert len(items) == 3
+        assert [item.id for item in items] == item_ids
+
+    def test_over_demand(self, session):
+        """
+        Test assigning invalid discount percentage
+        to the discount offer
+
+        """
+
+        with pytest.raises(OverDemand) as exc_info:
+            Item.pick(session, 5)
+
+        expected_error_message = (
+            f"Excess demand request. Only 0 is available, but 5 is requested."
+        )
+        assert exc_info.match(expected_error_message)
