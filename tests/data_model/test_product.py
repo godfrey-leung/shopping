@@ -12,6 +12,10 @@ def fix_random_seed():
 
 @pytest.fixture(name="product")
 def make_product():
+    """
+    Pytest fixture to generate a product instance
+
+    """
     def _generate(
             product_id: int,
             name: str,
@@ -33,8 +37,8 @@ class TestProduct:
 
     def test_invalid_unit_price(self, session):
         """
-        Test assigning invalid required quantity
-        to the discount offer
+        Test assigning invalid unit price to
+        a product
 
         """
 
@@ -133,10 +137,30 @@ class TestProduct:
         assert len(items) == 3
         assert [item.id for item in items] == item_ids
 
+    def test_invalid_quantity(self, session):
+        """
+        Test invalid request quantity when calling .pick() method
+
+        """
+
+        session.add(
+            Product(
+                id=0,
+                name='B'
+            )
+        )
+
+        with pytest.raises(InvalidValue) as exc_info:
+            Product.pick(session, 'B', -1)
+
+        expected_error_message = (
+            f"Quantity request must be positive."
+        )
+        assert exc_info.match(expected_error_message)
+
     def test_over_demand(self, session):
         """
-        Test assigning invalid discount percentage
-        to the discount offer
+        Test excess request when calling .pick() method
 
         """
 
@@ -164,7 +188,7 @@ class TestDiscountOffer:
     def test_invalid_required_quantity(self, session):
         """
         Test assigning invalid required quantity
-        to the discount offer
+        to a discount offer
 
         """
 
@@ -183,7 +207,7 @@ class TestDiscountOffer:
     def test_invalid_discount(self, session):
         """
         Test assigning invalid discount percentage
-        to the discount offer
+        to a discount offer
 
         """
 
@@ -234,7 +258,7 @@ class TestItem:
 
     def test_add_item(self, product, session):
         """
-        Test add an offer to the database
+        Test add an item to the database
 
         """
 

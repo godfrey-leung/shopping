@@ -129,11 +129,18 @@ class Product(Base, ModelMixin):
 
         Raises
         ------
+        InvalidValue
+            If the request quantity is non-positive
         OverDemand
             If request to pick more items than what is available
             in the database
 
         """
+
+        if quantity <= 0:
+            raise InvalidValue(
+                "Quantity request must be positive."
+            )
 
         product = cls.with_name(session, name)
         items_available = [
@@ -188,7 +195,7 @@ class DiscountOffer(Base, ModelMixin):
 
     @validates('discount')
     def validate_discount(self, key, value):
-        if not 100 > value > 0:
+        if not 100 > value >= 0:
             raise InvalidValue(
                 "Discount percentage must be between 0 and 100."
             )
@@ -216,8 +223,6 @@ class Item(Base, ModelMixin):
     ----------
     is_available
         Whether the item is available
-    purchased_price
-        the price the item is purchased at
     product
         what product the item is
 
@@ -225,7 +230,6 @@ class Item(Base, ModelMixin):
     __tablename__ = "item"
 
     is_available = Column(Boolean, default=True)
-    purchased_price = Column(Float)
 
     product_id = Column(
         Integer,

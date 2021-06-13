@@ -9,8 +9,7 @@ class InstanceNotFound(Exception):
 
 class InvalidValue(Exception):
     """
-    Raise if an invalid value is assigned to
-    an instance column in the datase
+    Raise if an invalid value is given
     """
 
 
