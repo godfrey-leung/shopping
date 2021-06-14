@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from pathlib import Path
 
-from scripts.make_store import make_new_store
+from shopping_cart.make_store import make_new_store
 from shopping_cart.shopping.cart import ShoppingCart
 
 directory = Path(__file__).parent.parent
