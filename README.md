@@ -8,7 +8,7 @@ what products and their corresponding quantities are in the cart, detailed price
 total tax amount and total price) of the cart.
 
 Promotion discount offer type considered are "Buy N, get Y % off for the next item" (Buy 1 get 1 free is a special case example)
-and "Get X % off if total purchase >= Z". Note that for a "Buy N get M free" promotion,
+and "Get X % off if total purchase >= Z". 
 
 
 # Project top-level directory structure
@@ -104,13 +104,16 @@ While the current version provides a simple backend to support a (e-)shopping pl
 are considered in order to make this backend service more practical and powerful such that can be deployed in a
 real-world scenarios
 
-## shopping cart
+### shopping cart
 - add method to remove items from a shopping cart
 - add method to empty a shopping cart
+- add method to checkout a cart (and simultaneously change the cart items in the database to unavailable)
 
-## product database
+### product database
 - add more attribute columns for a product, e.g. product type, brand
--
+- allow multiple offers associated to a product
+- add created timestamp attributes to allow future audit and analytics purposes
+- add more attribute columns for an item, e.g. expiration date
 
 
 # License
