@@ -229,3 +229,21 @@ class TestShoppingCart:
             "C", 5
         )
         assert cart.total_price(5) == 315
+
+    def test_price_breakdown(
+            self, cart
+    ):
+        """
+        Test the cart price breakdown
+
+        """
+
+        cart.add_product_items(
+            "C", 5
+        )
+        cart.add_product_items(
+            "A", 2
+        )
+        assert cart.price_breakdown(8) == {
+            'total_discount': 200.0, 'total_price': 388.78, 'total_tax': 28.8
+        }
