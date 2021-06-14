@@ -8,7 +8,6 @@ what products and their corresponding quantities are in the cart, detailed price
 total tax amount and total price) of the cart.
 
 
-
 # Project top-level directory structure
 
     ├── files                       # config yaml files
@@ -40,6 +39,22 @@ total tax amount and total price) of the cart.
 
 # Requirements
 
+See requirements.txt for the package dependencies. To compile, run and manage the project, Poetry must be installed.
+See https://python-poetry.org/docs/cli/ for further information
+
+# Command
+
+To install the package, run
+
+```bash
+poetry install
+```
+
+To run the unit tests, use the following commands
+
+```bash
+poetry run pytest
+```
 
 
 # Product Warehouse Database schema
@@ -74,3 +89,8 @@ Below is the store product warehouse database model schema
 
     - add method to remove items from a shopping cart
     - add method to empty a shopping cart
+
+
+# License
+
+This project is currently developed under the MIT license. For more details, please refer to the license.
