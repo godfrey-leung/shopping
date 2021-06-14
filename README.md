@@ -46,7 +46,7 @@ and "Get X % off if total purchase >= Z".
 # Requirements
 
 See requirements.txt for the package dependencies. To compile, run and manage the project, Poetry must be installed.
-See https://python-poetry.org/docs/cli/ for further information
+See https://python-poetry.org/docs/cli/ for further information. This project uses python 3.7 (tested).
 
 # Command
 
