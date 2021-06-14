@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "shopping_cart"
+version = "1.0.0"
+description = "a simple shopping cart backend service, including product database"
+authors = ["Godfrey Leung <godfrey.leung.cosmo@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+keywords = [
+    "Shopping Cart",
+    "Backend",
+    "Product Database"
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+SQLAlchemy = "1.2.12"
+pyyaml = "^5.3"
+
+[tool.poetry.dev-dependencies]
+pytest = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
