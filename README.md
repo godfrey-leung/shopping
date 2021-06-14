@@ -1,15 +1,21 @@
-# scalpel_analytics_model
+# shopping cart backend service
 
 This simple python project is a solution to the Shopping Cart interview question at QoKoon.
 
 The goal is to build a backend service that supports a shopping platform or a cashier system which provides
-a detailed pricing of any shopping carts during checkout. The service should identify the unit price of a product,
+a detailed price breakdown of any shopping carts during checkout. The service should identify the unit price of a product,
 what products and their corresponding quantities are in the cart, detailed price breakdown (i.e. total discount,
 total tax amount and total price) of the cart.
+
+Promotion discount offer type considered are "Buy N, get Y % off for the next item" (Buy 1 get 1 free is a special case example)
+and "Get X % off if total purchase >= Z". Note that for a "Buy N get M free" promotion,
 
 
 # Project top-level directory structure
 
+    ├── examples                    # config yaml file
+        ├── __init__.py
+        ├── ...                     # explicit examples
     ├── files                       # config yaml files
         ├── stores
             ├── ...                 # example of store product config yaml files
@@ -56,6 +62,13 @@ To run the unit tests, use the following commands
 poetry run pytest
 ```
 
+# Examples
+
+Explicit examples (as stated in the test) can be found under the `/examples` directory. To run the example, run
+```bash
+python ./examples/example_{x}.py
+```
+
 
 # Product Warehouse Database schema
 
@@ -87,10 +100,19 @@ Below is the store product warehouse database model schema
 
 # Future Improvements
 
-    - add method to remove items from a shopping cart
-    - add method to empty a shopping cart
+While the current version provides a simple backend to support a (e-)shopping platform, following future improvements
+are considered in order to make this backend service more practical and powerful such that can be deployed in a
+real-world scenarios
+
+## shopping cart
+- add method to remove items from a shopping cart
+- add method to empty a shopping cart
+
+## product database
+- add more attribute columns for a product, e.g. product type, brand
+-
 
 
 # License
 
-This project is currently developed under the MIT license. For more details, please refer to the license.
+This project is developed by Godfrey Leung. For more details, please refer to the license.
