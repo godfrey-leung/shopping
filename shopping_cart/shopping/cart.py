@@ -141,7 +141,6 @@ class ShoppingCart:
                 )
 
             price_after_product_discount = self.total_marked_price - amount
-            print(price_after_product_discount)
             if price_after_product_discount >= required_purchase_total:
                 global_discount = price_after_product_discount * global_rate / 100
                 amount += global_discount
@@ -207,7 +206,7 @@ class ShoppingCart:
             self.total_price_before_tax(
                 required_purchase_total, global_rate
             ) * tax_rate / 100,
-            2
+            1
         )
 
     def total_price(
@@ -238,6 +237,45 @@ class ShoppingCart:
         return round(
             self.total_price_before_tax(
                 required_purchase_total, global_rate
-            ) + self.total_tax_amount(tax_rate),
+            ) + self.total_tax_amount(
+                tax_rate, required_purchase_total, global_rate
+            ),
             2
         )
+
+    def price_breakdown(
+            self,
+            tax_rate: float,
+            required_purchase_total: Optional[float] = None,
+            global_rate: Optional[float] = None
+    ) -> dict:
+        """
+        Breakdown price of the cart in a dict including total discount,
+        total tax amount and total price
+
+        Parameters
+        ----------
+        tax_rate
+            tax rate (in percentage) of the shopping cart
+        required_purchase_total
+            required total cost of the purchase to get the global discount
+        global_rate
+            global discount rate
+
+        Returns
+        -------
+            breakdown price
+
+        """
+
+        return {
+            "total_discount": self.total_discount(
+                required_purchase_total, global_rate
+            ),
+            "total_tax": self.total_tax_amount(
+                tax_rate, required_purchase_total, global_rate
+            ),
+            "total_price": self.total_price(
+                tax_rate, required_purchase_total, global_rate
+            )
+        }
