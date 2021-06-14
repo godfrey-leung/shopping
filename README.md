@@ -8,7 +8,7 @@ what products and their corresponding quantities are in the cart, detailed price
 total tax amount and total price) of the cart.
 
 Promotion discount offer type considered are "Buy N, get Y % off for the next item" (Buy 1 get 1 free is a special case example)
-and "Get X % off if total purchase >= Z". 
+and "Get X % off if total purchase >= Z".
 
 
 # Project top-level directory structure
@@ -101,7 +101,7 @@ Below is the store product warehouse database model schema
 # Future Improvements
 
 While the current version provides a simple backend to support a (e-)shopping platform, following future improvements
-are considered in order to make this backend service more practical and powerful such that can be deployed in a
+will be considered in order to make this backend service more practical and powerful such that can be deployed in a
 real-world scenarios
 
 ### shopping cart
@@ -114,6 +114,7 @@ real-world scenarios
 - allow multiple offers associated to a product
 - add created timestamp attributes to allow future audit and analytics purposes
 - add more attribute columns for an item, e.g. expiration date
+- add product database version control, e.g. using migration tools such as alembic
 
 
 # License
