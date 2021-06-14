@@ -43,7 +43,7 @@ class TestPopulate:
 
         product_C = m.Product.with_name(store, 'C')
         assert product_C.discount_offer.required_quantity == 2
-        assert product_C.discount_offer.percentage == 0
+        assert product_C.discount_offer.percentage == 100
 
         # Test items
         assert m.Item.count(store) == 60

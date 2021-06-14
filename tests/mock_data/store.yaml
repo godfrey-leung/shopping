@@ -13,4 +13,4 @@ products:
     number_in_store: 10
     promotion:
       required_quantity: 2
-      percentage: 0
+      percentage: 100

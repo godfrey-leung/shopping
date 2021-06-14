@@ -239,7 +239,7 @@ class TestDiscountOffer:
             )
 
         expected_error_message = (
-            "Discount percentage must be between 0 and 100."
+            "Discount percentage must be between 0 and 100, including 100 but not 0."
         )
         assert exc_info.match(expected_error_message)
 

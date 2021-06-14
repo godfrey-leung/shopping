@@ -173,7 +173,7 @@ class DiscountOffer(Base, ModelMixin):
     ----------
     required_quantity
         purchase quantity required to get the promotion,
-        i.e. the quantity N in "Buy N, Get Y % off for the next one"
+        i.e. the quantity N in "Buy N-1, Get Y % off for the next one"
     discount
         discount offer in the promotion, i.e. the percent Y in \
         "Buy N, Get Y % off for the next one"
@@ -195,9 +195,9 @@ class DiscountOffer(Base, ModelMixin):
 
     @validates('percentage')
     def validate_discount(self, key, value):
-        if not 100 > value >= 0:
+        if not 100 >= value > 0:
             raise InvalidValue(
-                "Discount percentage must be between 0 and 100."
+                "Discount percentage must be between 0 and 100, including 100 but not 0."
             )
 
         return value

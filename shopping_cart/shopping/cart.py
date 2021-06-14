@@ -34,7 +34,7 @@ class ShoppingCart:
 
         self.store = store
         self.cart_id = cart_id
-        self.items = items
+        self.items = items or []
 
     def add_product_items(
             self,
@@ -89,25 +89,34 @@ class ShoppingCart:
 
         """
 
-        if self.items is None:
-            return 0
-
         total = 0
         for item in self.items:
             total += item.product.unit_price
 
         return total
 
-    @property
-    def total_discount(self) -> float:
+    def total_discount(
+            self,
+            required_purchase_total: Optional[float] = None,
+            global_rate: Optional[float] = None
+    ) -> float:
         """
-        Total discount amount, rounded off to the
-        2 decimal places
+        Total discount amount including individual product discounts and
+        global discount, rounded off to the 2 decimal places
+
+        Parameters
+        ----------
+        required_purchase_total
+            required total cost of the purchase to get the global discount
+        global_rate
+            global discount rate
+
+        Returns
+        -------
+        amount
+            total discount amount
 
         """
-
-        if self.items is None:
-            return 0
 
         amount = 0
         for product, quantity in self.product_list.items():
@@ -116,21 +125,55 @@ class ShoppingCart:
                 continue
 
             number_of_discounted_items = quantity // discount_offer.required_quantity
-            amount += product.unit_price * number_of_discounted_items * discount_offer.percentage
+            amount += product.unit_price * number_of_discounted_items * discount_offer.percentage / 100
+
+        # add global discount
+        if required_purchase_total is not None:
+            if required_purchase_total <= 0:
+                raise InvalidValue(
+                    f"The required total cost of the purchase for global discount must be positive. "
+                    f"{required_purchase_total} is given instead."
+                )
+
+            if not 100 > global_rate > 0:
+                raise InvalidValue(
+                    f"Global discount rate must be between 0 and 100. {global_rate} is given instead."
+                )
+
+            price_after_product_discount = self.total_marked_price - amount
+            print(price_after_product_discount)
+            if price_after_product_discount >= required_purchase_total:
+                global_discount = price_after_product_discount * global_rate / 100
+                amount += global_discount
+
         return round(amount, 2)
 
-    @property
-    def total_price_before_tax(self) -> float:
+    def total_price_before_tax(
+            self,
+            required_purchase_total: Optional[float] = None,
+            global_rate: Optional[float] = None
+    ) -> float:
         """
-        Total price before tax
+        Total price before tax after discount
+
+        Parameters
+        ----------
+        required_purchase_total
+            required total cost of the purchase to get the global discount
+        global_rate
+            global discount rate
 
         """
 
-        return self.total_marked_price - self.total_discount
+        return self.total_marked_price - self.total_discount(
+            required_purchase_total, global_rate
+        )
 
     def total_tax_amount(
             self,
-            tax_rate: float
+            tax_rate: float,
+            required_purchase_total: Optional[float] = None,
+            global_rate: Optional[float] = None
     ) -> float:
         """
         Total tax amount on total marked discounted price
@@ -139,6 +182,10 @@ class ShoppingCart:
         ----------
         tax_rate
             tax rate (in percentage) of the shopping cart
+        required_purchase_total
+            required total cost of the purchase to get the global discount
+        global_rate
+            global discount rate
 
         Returns
         -------
@@ -157,13 +204,17 @@ class ShoppingCart:
             )
 
         return round(
-            self.total_price_before_tax * tax_rate / 100,
+            self.total_price_before_tax(
+                required_purchase_total, global_rate
+            ) * tax_rate / 100,
             2
         )
 
     def total_price(
             self,
-            tax_rate: float
+            tax_rate: float,
+            required_purchase_total: Optional[float] = None,
+            global_rate: Optional[float] = None
     ) -> float:
         """
         Total price of the cart with discount subtracted
@@ -173,6 +224,10 @@ class ShoppingCart:
         ----------
         tax_rate
             tax rate (in percentage) of the shopping cart
+        required_purchase_total
+            required total cost of the purchase to get the global discount
+        global_rate
+            global discount rate
 
         Returns
         -------
@@ -181,6 +236,8 @@ class ShoppingCart:
         """
 
         return round(
-            self.total_price_before_tax - self.total_tax_amount(tax_rate),
+            self.total_price_before_tax(
+                required_purchase_total, global_rate
+            ) + self.total_tax_amount(tax_rate),
             2
         )
