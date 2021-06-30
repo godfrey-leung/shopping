@@ -1,7 +1,5 @@
 # shopping cart backend service
 
-This simple python project is a solution to the Shopping Cart interview question at QoKoon.
-
 The goal is to build a backend service that supports a shopping platform or a cashier system which provides
 a detailed price breakdown of any shopping carts during checkout. The service should identify the unit price of a product,
 what products and their corresponding quantities are in the cart, detailed price breakdown (i.e. total discount,
